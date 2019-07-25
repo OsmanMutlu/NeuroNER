@@ -49,7 +49,7 @@ def fetch_model(name):
     # model.ckpt.index
     # model.ckpt.meta
     # parameters.ini
-    _fetch(name, content_type="trained_models") 
+    _fetch(name, content_type="trained_models")
 
 
 def fetch_data(name):
@@ -290,11 +290,11 @@ def get_valid_dataset_filepaths(parameters):
     dataset_brat_folders = {}
 
     for dataset_type in ['train', 'valid', 'test', 'deploy']:
-        dataset_filepaths[dataset_type] = os.path.join(parameters['dataset_text_folder'], 
+        dataset_filepaths[dataset_type] = os.path.join(parameters['dataset_text_folder'],
             '{0}.txt'.format(dataset_type))
-        dataset_brat_folders[dataset_type] = os.path.join(parameters['dataset_text_folder'], 
+        dataset_brat_folders[dataset_type] = os.path.join(parameters['dataset_text_folder'],
             dataset_type)
-        dataset_compatible_with_brat_filepath = os.path.join(parameters['dataset_text_folder'], 
+        dataset_compatible_with_brat_filepath = os.path.join(parameters['dataset_text_folder'],
             '{0}_compatible_with_brat.txt'.format(dataset_type))
 
         # Conll file exists
@@ -310,14 +310,14 @@ def get_valid_dataset_filepaths(parameters):
                 if os.path.exists(dataset_compatible_with_brat_filepath):
                     dataset_filepaths[dataset_type] = dataset_compatible_with_brat_filepath
 
-                conll_to_brat.check_compatibility_between_conll_and_brat_text(dataset_filepaths[dataset_type], 
+                conll_to_brat.check_compatibility_between_conll_and_brat_text(dataset_filepaths[dataset_type],
                     dataset_brat_folders[dataset_type])
 
             # Brat text files do not exist
             else:
 
                 # Populate brat text and annotation files based on conll file
-                conll_to_brat.conll_to_brat(dataset_filepaths[dataset_type], dataset_compatible_with_brat_filepath, 
+                conll_to_brat.conll_to_brat(dataset_filepaths[dataset_type], dataset_compatible_with_brat_filepath,
                     dataset_brat_folders[dataset_type], dataset_brat_folders[dataset_type])
                 dataset_filepaths[dataset_type] = dataset_compatible_with_brat_filepath
 
@@ -326,15 +326,15 @@ def get_valid_dataset_filepaths(parameters):
             # Brat text files exist
             if os.path.exists(dataset_brat_folders[dataset_type]) \
             and len(glob.glob(os.path.join(dataset_brat_folders[dataset_type], '*.txt'))) > 0:
-                dataset_filepath_for_tokenizer = os.path.join(parameters['dataset_text_folder'], 
+                dataset_filepath_for_tokenizer = os.path.join(parameters['dataset_text_folder'],
                     '{0}_{1}.txt'.format(dataset_type, parameters['tokenizer']))
                 if os.path.exists(dataset_filepath_for_tokenizer):
-                    conll_to_brat.check_compatibility_between_conll_and_brat_text(dataset_filepath_for_tokenizer, 
+                    conll_to_brat.check_compatibility_between_conll_and_brat_text(dataset_filepath_for_tokenizer,
                         dataset_brat_folders[dataset_type])
                 else:
                     # Populate conll file based on brat files
-                    brat_to_conll.brat_to_conll(dataset_brat_folders[dataset_type], 
-                        dataset_filepath_for_tokenizer, parameters['tokenizer'], 
+                    brat_to_conll.brat_to_conll(dataset_brat_folders[dataset_type],
+                        dataset_filepath_for_tokenizer, parameters['tokenizer'],
                         parameters['spacylanguage'])
                 dataset_filepaths[dataset_type] = dataset_filepath_for_tokenizer
 
@@ -346,9 +346,9 @@ def get_valid_dataset_filepaths(parameters):
 
         if parameters['tagging_format'] == 'bioes':
             # Generate conll file with BIOES format
-            bioes_filepath = os.path.join(parameters['dataset_text_folder'], 
+            bioes_filepath = os.path.join(parameters['dataset_text_folder'],
                 '{0}_bioes.txt'.format(utils.get_basename_without_extension(dataset_filepaths[dataset_type])))
-            utils_nlp.convert_conll_from_bio_to_bioes(dataset_filepaths[dataset_type], 
+            utils_nlp.convert_conll_from_bio_to_bioes(dataset_filepaths[dataset_type],
                 bioes_filepath)
             dataset_filepaths[dataset_type] = bioes_filepath
 
@@ -362,16 +362,16 @@ def check_param_compatibility(parameters, dataset_filepaths):
     # Check mode of operation
     if parameters['train_model']:
         if 'train' not in dataset_filepaths or 'valid' not in dataset_filepaths:
-            msg = """If train_model is set to True, both train and valid set must exist 
+            msg = """If train_model is set to True, both train and valid set must exist
                 in the specified dataset folder: {0}""".format(parameters['dataset_text_folder'])
             raise IOError(msg)
     elif parameters['use_pretrained_model']:
         if 'train' in dataset_filepaths and 'valid' in dataset_filepaths:
-            msg = """WARNING: train and valid set exist in the specified dataset folder, 
+            msg = """WARNING: train and valid set exist in the specified dataset folder,
                 but train_model is set to FALSE: {0}""".format(parameters['dataset_text_folder'])
             print(msg)
         if 'test' not in dataset_filepaths and 'deploy' not in dataset_filepaths:
-            msg = """For prediction mode, either test set and deploy set must exist 
+            msg = """For prediction mode, either test set and deploy set must exist
                 in the specified dataset folder: {0}""".format(parameters['dataset_text_folder'])
             raise IOError(msg)
     # if not parameters['train_model'] and not parameters['use_pretrained_model']:
@@ -379,10 +379,10 @@ def check_param_compatibility(parameters, dataset_filepaths):
         raise ValueError("At least one of train_model and use_pretrained_model must be set to True.")
 
     if parameters['use_pretrained_model']:
-        if all([not parameters[s] for s in ['reload_character_embeddings', 'reload_character_lstm', 
+        if all([not parameters[s] for s in ['reload_character_embeddings', 'reload_character_lstm',
             'reload_token_embeddings', 'reload_token_lstm', 'reload_feedforward', 'reload_crf']]):
-            msg = """If use_pretrained_model is set to True, at least one of reload_character_embeddings, 
-                reload_character_lstm, reload_token_embeddings, reload_token_lstm, reload_feedforward, 
+            msg = """If use_pretrained_model is set to True, at least one of reload_character_embeddings,
+                reload_character_lstm, reload_token_embeddings, reload_token_lstm, reload_feedforward,
                 reload_crf must be set to True."""
             raise ValueError(msg)
 
@@ -502,7 +502,7 @@ class NeuroNER(object):
         utils.create_folder_if_not_exists(parameters['output_folder'])
 
         # Folder where to save graphs
-        stats_graph_folder = os.path.join(parameters['output_folder'], model_name) 
+        stats_graph_folder = os.path.join(parameters['output_folder'], model_name)
         utils.create_folder_if_not_exists(stats_graph_folder)
         return stats_graph_folder, experiment_timestamp
 
@@ -518,11 +518,11 @@ class NeuroNER(object):
         dataset_brat_folders = {}
 
         for dataset_type in dataset_types:
-            dataset_filepaths[dataset_type] = os.path.join(parameters['dataset_text_folder'], 
+            dataset_filepaths[dataset_type] = os.path.join(parameters['dataset_text_folder'],
                 '{0}.txt'.format(dataset_type))
-            dataset_brat_folders[dataset_type] = os.path.join(parameters['dataset_text_folder'], 
+            dataset_brat_folders[dataset_type] = os.path.join(parameters['dataset_text_folder'],
                 dataset_type)
-            dataset_compatible_with_brat_filepath = os.path.join(parameters['dataset_text_folder'], 
+            dataset_compatible_with_brat_filepath = os.path.join(parameters['dataset_text_folder'],
                 '{0}_compatible_with_brat.txt'.format(dataset_type))
 
             # Conll file exists
@@ -536,14 +536,14 @@ class NeuroNER(object):
                     brat_to_conll.check_brat_annotation_and_text_compatibility(dataset_brat_folders[dataset_type])
                     if os.path.exists(dataset_compatible_with_brat_filepath):
                         dataset_filepaths[dataset_type] = dataset_compatible_with_brat_filepath
-                    conll_to_brat.check_compatibility_between_conll_and_brat_text(dataset_filepaths[dataset_type], 
+                    conll_to_brat.check_compatibility_between_conll_and_brat_text(dataset_filepaths[dataset_type],
                         dataset_brat_folders[dataset_type])
 
                 # Brat text files do not exist
                 else:
                     # Populate brat text and annotation files based on conll file
-                    conll_to_brat.conll_to_brat(dataset_filepaths[dataset_type], 
-                        dataset_compatible_with_brat_filepath, dataset_brat_folders[dataset_type], 
+                    conll_to_brat.conll_to_brat(dataset_filepaths[dataset_type],
+                        dataset_compatible_with_brat_filepath, dataset_brat_folders[dataset_type],
                         dataset_brat_folders[dataset_type])
                     dataset_filepaths[dataset_type] = dataset_compatible_with_brat_filepath
 
@@ -552,14 +552,14 @@ class NeuroNER(object):
                 # Brat text files exist
                 if os.path.exists(dataset_brat_folders[dataset_type]) \
                 and len(glob.glob(os.path.join(dataset_brat_folders[dataset_type], '*.txt'))) > 0:
-                    dataset_filepath_for_tokenizer = os.path.join(parameters['dataset_text_folder'], 
+                    dataset_filepath_for_tokenizer = os.path.join(parameters['dataset_text_folder'],
                         '{0}_{1}.txt'.format(dataset_type, parameters['tokenizer']))
                     if os.path.exists(dataset_filepath_for_tokenizer):
-                        conll_to_brat.check_compatibility_between_conll_and_brat_text(dataset_filepath_for_tokenizer, 
+                        conll_to_brat.check_compatibility_between_conll_and_brat_text(dataset_filepath_for_tokenizer,
                             dataset_brat_folders[dataset_type])
                     else:
                         # Populate conll file based on brat files
-                        brat_to_conll.brat_to_conll(dataset_brat_folders[dataset_type], 
+                        brat_to_conll.brat_to_conll(dataset_brat_folders[dataset_type],
                             dataset_filepath_for_tokenizer, parameters['tokenizer'], parameters['spacylanguage'])
                     dataset_filepaths[dataset_type] = dataset_filepath_for_tokenizer
 
@@ -625,14 +625,14 @@ class NeuroNER(object):
         utils.create_folder_if_not_exists(tensorboard_log_folder)
         tensorboard_log_folders = {}
         for dataset_type in dataset_filepaths.keys():
-            tensorboard_log_folders[dataset_type] = os.path.join(stats_graph_folder, 
+            tensorboard_log_folders[dataset_type] = os.path.join(stats_graph_folder,
                 'tensorboard_logs', dataset_type)
             utils.create_folder_if_not_exists(tensorboard_log_folders[dataset_type])
 
         # Instantiate the writers for TensorBoard
         writers = {}
         for dataset_type in dataset_filepaths.keys():
-            writers[dataset_type] = tf.summary.FileWriter(tensorboard_log_folders[dataset_type], 
+            writers[dataset_type] = tf.summary.FileWriter(tensorboard_log_folders[dataset_type],
                 graph=sess.graph)
 
         # embedding_writer has to write in model_folder, otherwise TensorBoard won't be able to view embeddings
@@ -684,7 +684,7 @@ class NeuroNER(object):
                     sequence_numbers=list(range(len(modeldata.token_indices['train'])))
                     random.shuffle(sequence_numbers)
                     for sequence_number in sequence_numbers:
-                        transition_params_trained = train.train_step(sess, modeldata, 
+                        transition_params_trained = train.train_step(sess, modeldata,
                             sequence_number, model, parameters)
                         step += 1
                         if step % 10 == 0:
@@ -756,30 +756,30 @@ class NeuroNER(object):
         Args:
             text (str): Description.
         """
-        self.prediction_count += 1        
+        self.prediction_count += 1
 
         if self.prediction_count == 1:
             self.parameters['dataset_text_folder'] = os.path.join('.', 'data', 'temp')
             self.stats_graph_folder, _ = self._create_stats_graph_folder(self.parameters)
 
-        # Update the deploy folder, file, and modeldata 
+        # Update the deploy folder, file, and modeldata
         dataset_type = 'deploy'
 
-        # Delete all deployment data    
-        for filepath in glob.glob(os.path.join(self.parameters['dataset_text_folder'], 
+        # Delete all deployment data
+        for filepath in glob.glob(os.path.join(self.parameters['dataset_text_folder'],
             '{0}*'.format(dataset_type))):
-            if os.path.isdir(filepath): 
+            if os.path.isdir(filepath):
                 shutil.rmtree(filepath)
             else:
                 os.remove(filepath)
 
-        # Create brat folder and file
-        dataset_brat_deploy_folder = os.path.join(self.parameters['dataset_text_folder'], 
+        # # Create brat folder and file
+        dataset_brat_deploy_folder = os.path.join(self.parameters['dataset_text_folder'],
             dataset_type)
         utils.create_folder_if_not_exists(dataset_brat_deploy_folder)
-        dataset_brat_deploy_filepath = os.path.join(dataset_brat_deploy_folder, 
+        dataset_brat_deploy_filepath = os.path.join(dataset_brat_deploy_folder,
             'temp_{0}.txt'.format(str(self.prediction_count).zfill(5)))
-            #self._get_dataset_brat_deploy_filepath(dataset_brat_deploy_folder) 
+            #self._get_dataset_brat_deploy_filepath(dataset_brat_deploy_folder)
         with codecs.open(dataset_brat_deploy_filepath, 'w', 'UTF-8') as f:
             f.write(text)
 
@@ -787,7 +787,7 @@ class NeuroNER(object):
         dataset_filepaths, dataset_brat_folders = self._get_valid_dataset_filepaths(self.parameters,
             dataset_types=[dataset_type])
         self.dataset_filepaths.update(dataset_filepaths)
-        self.dataset_brat_folders.update(dataset_brat_folders)    
+        self.dataset_brat_folders.update(dataset_brat_folders)
 
         # Update the dataset for the new deploy set
         self.modeldata.update_dataset(self.dataset_filepaths, [dataset_type])
@@ -796,22 +796,9 @@ class NeuroNER(object):
         output_filepaths = {}
         prediction_output = train.prediction_step(self.sess, self.modeldata,
             dataset_type, self.model, self.transition_params_trained,
-            self.stats_graph_folder, self.prediction_count, self.parameters,
-            self.dataset_filepaths)
+            self.prediction_count, self.parameters)
 
-        _, _, output_filepaths[dataset_type] = prediction_output
-        conll_to_brat.output_brat(output_filepaths, self.dataset_brat_folders, 
-            self.stats_graph_folder, overwrite=True)
-
-        # Print and output result
-        text_filepath = os.path.join(self.stats_graph_folder, 'brat', 'deploy', 
-            os.path.basename(dataset_brat_deploy_filepath))
-        annotation_filepath = os.path.join(self.stats_graph_folder, 'brat', 
-            'deploy', '{0}.ann'.format(utils.get_basename_without_extension(dataset_brat_deploy_filepath)))
-        text2, entities = brat_to_conll.get_entities_from_brat(text_filepath, 
-            annotation_filepath, verbose=True)
-        assert(text == text2)
-        return entities
+        return prediction_output
 
     def get_params(self):
         return self.parameters
